@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>장씨아저씨 프리미엄 과일</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;600;700&family=Noto+Sans+KR:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black: #0a0a0a;
+      --dark: #111111;
+      --card: #181818;
+      --border: #2a2a2a;
+      --gold: #c9a84c;
+      --gold-light: #e2c170;
+      --gold-dim: #8a6f30;
+      --white: #f5f0e8;
+      --gray: #888;
+      --light-gray: #bbb;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--black);
+      color: var(--white);
+      font-family: 'Noto Sans KR', sans-serif;
+      font-weight: 300;
+      line-height: 1.7;
+      min-height: 100vh;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 40px;
+      background: rgba(10,10,10,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      font-family: 'Noto Serif KR', serif;
+      font-size: 16px;
+      letter-spacing: 0.12em;
+      color: var(--gold);
+      text-decoration: none;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--light-gray);
+      text-decoration: none;
+      font-size: 13px;
+      letter-spacing: 0.08em;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--gold); }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 120px 24px 80px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 50% at 50% 40%, rgba(201,168,76,0.07) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-tag {
+      display: inline-block;
+      border: 1px solid var(--gold-dim);
+      color: var(--gold);
+      font-size: 11px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      padding: 6px 18px;
+      border-radius: 2px;
+      margin-bottom: 40px;
+    }
+
+    .hero h1 {
+      font-family: 'Noto Serif KR', serif;
+      font-size: clamp(36px, 6vw, 72px);
+      font-weight: 300;
+      letter-spacing: 0.04em;
+      line-height: 1.25;
+      margin-bottom: 12px;
+    }
+
+    .hero h1 em {
+      font-style: normal;
+      color: var(--gold);
+    }
+
+    .hero-sub {
+      font-size: clamp(13px, 1.8vw, 16px);
+      color: var(--gray);
+      letter-spacing: 0.06em;
+      margin-bottom: 56px;
+      max-width: 420px;
+    }
+
+    /* ── STATUS BADGE ── */
+    .status-wrap {
+      margin-bottom: 56px;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 28px;
+      border-radius: 50px;
+      font-size: 15px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+    }
+
+    .status-badge.open {
+      background: rgba(201,168,76,0.12);
+      border: 1px solid var(--gold-dim);
+      color: var(--gold-light);
+    }
+
+    .status-badge.closed {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      color: var(--gray);
+    }
+
+    .status-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+    }
+
+    .status-badge.open .status-dot {
+      background: var(--gold);
+      box-shadow: 0 0 8px var(--gold);
+      animation: pulse 2s infinite;
+    }
+
+    .status-badge.closed .status-dot {
+      background: var(--gray);
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .hero-cta {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--gold);
+      color: var(--black);
+      padding: 16px 36px;
+      border-radius: 3px;
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.15s;
+    }
+
+    .btn-primary:hover {
+      background: var(--gold-light);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: transparent;
+      color: var(--light-gray);
+      padding: 16px 36px;
+      border-radius: 3px;
+      border: 1px solid var(--border);
+      font-size: 14px;
+      letter-spacing: 0.06em;
+      text-decoration: none;
+      transition: border-color 0.2s, color 0.2s;
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--gold-dim);
+      color: var(--gold);
+    }
+
+    /* ── DIVIDER ── */
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    .divider-line { flex: 1; height: 1px; background: var(--border); }
+    .divider-icon { color: var(--gold-dim); font-size: 18px; }
+
+    /* ── SECTION ── */
+    section { padding: 100px 24px; max-width: 1000px; margin: 0 auto; }
+
+    .section-label {
+      font-size: 11px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--gold-dim);
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-family: 'Noto Serif KR', serif;
+      font-size: clamp(26px, 4vw, 40px);
+      font-weight: 300;
+      letter-spacing: 0.03em;
+      margin-bottom: 48px;
+      color: var(--white);
+    }
+
+    /* ── TODAY FRUIT ── */
+    .fruit-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 2px;
+    }
+
+    .fruit-card {
+      background: var(--card);
+      padding: 36px 32px;
+      border: 1px solid var(--border);
+      transition: border-color 0.2s;
+    }
+
+    .fruit-card:hover { border-color: var(--gold-dim); }
+
+    .fruit-emoji {
+      font-size: 40px;
+      margin-bottom: 20px;
+      display: block;
+    }
+
+    .fruit-name {
+      font-family: 'Noto Serif KR', serif;
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--white);
+      margin-bottom: 8px;
+    }
+
+    .fruit-origin {
+      font-size: 12px;
+      color: var(--gold-dim);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .fruit-desc {
+      font-size: 14px;
+      color: var(--gray);
+      line-height: 1.8;
+      margin-bottom: 20px;
+    }
+
+    .fruit-price {
+      font-family: 'Noto Serif KR', serif;
+      font-size: 22px;
+      color: var(--gold);
+      letter-spacing: 0.02em;
+    }
+
+    /* ── STORY ── */
+    .story-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2px;
+    }
+
+    .story-card {
+      background: var(--card);
+      padding: 40px 36px;
+      border: 1px solid var(--border);
+    }
+
+    .story-num {
+      font-family: 'Noto Serif KR', serif;
+      font-size: 48px;
+      font-weight: 300;
+      color: var(--gold-dim);
+      opacity: 0.4;
+      margin-bottom: 16px;
+      line-height: 1;
+    }
+
+    .story-title {
+      font-family: 'Noto Serif KR', serif;
+      font-size: 18px;
+      margin-bottom: 12px;
+      color: var(--white);
+    }
+
+    .story-body {
+      font-size: 14px;
+      color: var(--gray);
+      line-height: 1.9;
+    }
+
+    /* ── HOW TO ORDER ── */
+    .order-steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 2px;
+      margin-bottom: 56px;
+    }
+
+    .step {
+      background: var(--card);
+      padding: 36px 28px;
+      border: 1px solid var(--border);
+      text-align: center;
+    }
+
+    .step-num {
+      font-family: 'Noto Serif KR', serif;
+      font-size: 32px;
+      color: var(--gold);
+      margin-bottom: 16px;
+    }
+
+    .step-title {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--white);
+      margin-bottom: 8px;
+    }
+
+    .step-desc {
+      font-size: 13px;
+      color: var(--gray);
+      line-height: 1.8;
+    }
+
+    /* ── PAYMENT ── */
+    .payment-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      padding: 48px;
+      margin-bottom: 32px;
+    }
+
+    .payment-title {
+      font-family: 'Noto Serif KR', serif;
+      font-size: 18px;
+      color: var(--gold);
+      margin-bottom: 24px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .payment-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+
+    .payment-row:last-child { border-bottom: none; }
+
+    .payment-label {
+      font-size: 13px;
+      color: var(--gray);
+    }
+
+    .payment-value {
+      font-size: 14px;
+      color: var(--white);
+      font-weight: 500;
+      text-align: right;
+    }
+
+    .payment-notice {
+      background: rgba(201,168,76,0.06);
+      border: 1px solid var(--gold-dim);
+      border-radius: 2px;
+      padding: 16px 20px;
+      font-size: 13px;
+      color: var(--gold-dim);
+      line-height: 1.8;
+    }
+
+    /* ── CTA SECTION ── */
+    .cta-section {
+      padding: 100px 24px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta-section::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 50% 60% at 50% 50%, rgba(201,168,76,0.05) 0%, transparent 70%);
+    }
+
+    .cta-section .section-title {
+      max-width: 500px;
+      margin: 0 auto 16px;
+    }
+
+    .cta-sub {
+      font-size: 14px;
+      color: var(--gray);
+      margin-bottom: 48px;
+    }
+
+    .cta-btns {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 48px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .footer-logo {
+      font-family: 'Noto Serif KR', serif;
+      font-size: 14px;
+      color: var(--gold-dim);
+      letter-spacing: 0.08em;
+    }
+
+    .footer-copy {
+      font-size: 12px;
+      color: var(--gray);
+    }
+
+    /* ── MOBILE ── */
+    @media (max-width: 640px) {
+      nav { padding: 16px 20px; }
+      .nav-links { display: none; }
+      .story-grid { grid-template-columns: 1fr; }
+      .payment-box { padding: 28px 20px; }
+      footer { flex-direction: column; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="#" class="nav-logo">장씨아저씨 프리미엄 과일</a>
+    <ul class="nav-links">
+      <li><a href="#today">오늘의 과일</a></li>
+      <li><a href="#story">소개</a></li>
+      <li><a href="#order">주문방법</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <span class="hero-tag">Premium Fruit · 전국 공판장 직접 선별</span>
+    <h1>자신 있을 때만<br /><em>팝니다</em></h1>
+    <p class="hero-sub">전국 공판장을 직접 누비며 그날 가장 맛있는 과일을 찾았을 때만 문을 엽니다</p>
+
+    <div class="status-wrap">
+      <!-- 판매중일 때: class="status-badge open" / 준비중일 때: class="status-badge closed" -->
+      <div class="status-badge closed">
+        <span class="status-dot"></span>
+        <span>현재 준비중입니다</span>
+      </div>
+    </div>
+
+    <div class="hero-cta">
+      <a href="https://open.kakao.com/o/seTaDBIf" target="_blank" class="btn-primary">
+        💬 1:1 카카오톡 주문
+      </a>
+      <a href="https://open.kakao.com/o/gz1NvAQh" target="_blank" class="btn-secondary">
+        👥 단톡방 참여하기
+      </a>
+    </div>
+  </section>
+
+  <div class="divider"><div class="divider-line"></div><span class="divider-icon">✦</span><div class="divider-line"></div></div>
+
+  <!-- TODAY FRUIT -->
+  <section id="today">
+    <p class="section-label">Today's Selection</p>
+    <h2 class="section-title">오늘의 과일</h2>
+
+    <!-- 판매 없을 때 보여줄 메시지 (판매중엔 아래 카드로 교체) -->
+    <div style="background:var(--card); border:1px solid var(--border); padding:64px 32px; text-align:center;">
+      <p style="font-size:40px; margin-bottom:20px;">🍑</p>
+      <p style="font-family:'Noto Serif KR',serif; font-size:20px; color:var(--white); margin-bottom:12px;">오늘은 쉬는 날이에요</p>
+      <p style="font-size:14px; color:var(--gray); line-height:1.9;">
+        맛있는 과일을 찾는 날에만 문을 엽니다.<br />
+        단톡방을 참여해두시면 판매 시작할 때 가장 먼저 알 수 있어요.
+      </p>
+      <br />
+      <a href="https://open.kakao.com/o/gz1NvAQh" target="_blank" class="btn-secondary" style="display:inline-flex; margin-top:8px;">
+        👥 단톡방 참여하기
+      </a>
+    </div>
+
+    <!--
+    ▼▼▼ 판매중일 때는 위 div 지우고 아래 주석 해제 ▼▼▼
+
+    <div class="fruit-grid">
+      <div class="fruit-card">
+        <span class="fruit-emoji">🍇</span>
+        <p class="fruit-origin">경북 영천</p>
+        <h3 class="fruit-name">샤인머스캣</h3>
+        <p class="fruit-desc">껍질째 먹는 청포도. 높은 당도와 머스캣 향이 진해 한 알만 먹어도 기분이 좋아집니다.</p>
+        <p class="fruit-price">2kg · 35,000원</p>
+      </div>
+    </div>
+    -->
+  </section>
+
+  <!-- STORY -->
+  <section id="story">
+    <p class="section-label">Our Story</p>
+    <h2 class="section-title">장씨아저씨가<br />과일을 고르는 방법</h2>
+
+    <div class="story-grid">
+      <div class="story-card">
+        <p class="story-num">01</p>
+        <h3 class="story-title">전국 공판장을 직접 돕니다</h3>
+        <p class="story-body">경매장, 농가, 공판장을 직접 발로 뛰며 그날 가장 상태 좋은 과일을 눈으로 확인합니다. 온라인 사진만 보고 파는 과일은 없습니다.</p>
+      </div>
+      <div class="story-card">
+        <p class="story-num">02</p>
+        <h3 class="story-title">맛없으면 팔지 않습니다</h3>
+        <p class="story-body">좋은 과일이 없는 날은 그냥 문을 닫습니다. 매일 파는 것보다 제대로 된 것을 팔 때만 여는 것이 장씨아저씨의 방식입니다.</p>
+      </div>
+      <div class="story-card">
+        <p class="story-num">03</p>
+        <h3 class="story-title">직접 먹어보고 선별합니다</h3>
+        <p class="story-body">당도, 식감, 향, 상태를 직접 시식하고 기준에 맞는 것만 가져옵니다. 손님이 받아서 실망하는 과일은 팔지 않습니다.</p>
+      </div>
+      <div class="story-card">
+        <p class="story-num">04</p>
+        <h3 class="story-title">소량, 신선하게</h3>
+        <p class="story-body">대량으로 쌓아두고 파는 방식이 아닙니다. 가져온 양이 소진되면 그날 판매는 끝납니다. 항상 신선한 상태로 드립니다.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ORDER -->
+  <section id="order">
+    <p class="section-label">How to Order</p>
+    <h2 class="section-title">주문 방법</h2>
+
+    <div class="order-steps">
+      <div class="step">
+        <p class="step-num">1</p>
+        <p class="step-title">단톡방 참여</p>
+        <p class="step-desc">판매 시작 소식을<br />가장 먼저 받아보세요</p>
+      </div>
+      <div class="step">
+        <p class="step-num">2</p>
+        <p class="step-title">1:1 카톡 주문</p>
+        <p class="step-desc">품목, 수량,<br />배송지를 알려주세요</p>
+      </div>
+      <div class="step">
+        <p class="step-num">3</p>
+        <p class="step-title">입금 확인</p>
+        <p class="step-desc">안내받은 계좌로<br />입금해주세요</p>
+      </div>
+      <div class="step">
+        <p class="step-num">4</p>
+        <p class="step-title">발송 완료</p>
+        <p class="step-desc">당일 또는 익일<br />신선하게 발송됩니다</p>
+      </div>
+    </div>
+
+    <!-- PAYMENT -->
+    <div class="payment-box">
+      <p class="payment-title">💳 결제 안내</p>
+      <div class="payment-row">
+        <span class="payment-label">계좌이체</span>
+        <span class="payment-value">국민은행 78650101531851<br />예금주: 한나리(프루테리아)</span>
+      </div>
+    </div>
+
+    <div class="payment-notice">
+      ✦ &nbsp;입금 확인 후 발송이 시작됩니다. 주문 후 미입금 시 주문이 자동 취소될 수 있습니다.
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <div class="cta-section">
+    <p class="section-label">Get Notified</p>
+    <h2 class="section-title">판매 시작 때<br />가장 먼저 아세요</h2>
+    <p class="cta-sub">단톡방에 참여하시면 새 과일이 들어올 때마다 바로 알려드려요</p>
+    <div class="cta-btns">
+      <a href="https://open.kakao.com/o/gz1NvAQh" target="_blank" class="btn-primary">👥 단톡방 참여하기</a>
+      <a href="https://open.kakao.com/o/seTaDBIf" target="_blank" class="btn-secondary">💬 1:1 카카오톡 주문</a>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <p class="footer-logo">장씨아저씨 프리미엄 과일</p>
+    <p class="footer-copy">전국 공판장 직접 선별 · 맛있을 때만 판매</p>
+  </footer>
+
+</body>
+</html>
