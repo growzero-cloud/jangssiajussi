@@ -284,7 +284,53 @@
       object-fit: cover;
       border: 1px solid var(--border);
       flex-shrink: 0;
+      cursor: zoom-in;
+      transition: opacity 0.2s;
     }
+    .fruit-photos img:hover { opacity: 0.85; }
+
+    /* 라이트박스 */
+    #lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.92);
+      z-index: 999;
+      justify-content: center;
+      align-items: center;
+    }
+    #lightbox.active { display: flex; }
+    #lightbox img {
+      max-width: 92vw;
+      max-height: 88vh;
+      object-fit: contain;
+      border: 1px solid var(--border);
+    }
+    #lightbox-close {
+      position: fixed;
+      top: 20px; right: 24px;
+      color: var(--white);
+      font-size: 32px;
+      cursor: pointer;
+      line-height: 1;
+      opacity: 0.7;
+      transition: opacity 0.2s;
+    }
+    #lightbox-close:hover { opacity: 1; }
+    #lightbox-prev, #lightbox-next {
+      position: fixed;
+      top: 50%; transform: translateY(-50%);
+      color: var(--white);
+      font-size: 36px;
+      cursor: pointer;
+      opacity: 0.5;
+      transition: opacity 0.2s;
+      padding: 16px;
+      user-select: none;
+    }
+    #lightbox-prev { left: 12px; }
+    #lightbox-next { right: 12px; }
+    #lightbox-prev:hover, #lightbox-next:hover { opacity: 1; }
 
     .fruit-emoji {
       font-size: 40px;
@@ -635,6 +681,14 @@
     </div>
   </div>
 
+  <!-- 라이트박스 -->
+  <div id="lightbox" onclick="closeLightbox(event)">
+    <span id="lightbox-close" onclick="closeLightbox()">×</span>
+    <span id="lightbox-prev" onclick="lightboxMove(-1); event.stopPropagation();">‹</span>
+    <img id="lightbox-img" src="" />
+    <span id="lightbox-next" onclick="lightboxMove(1); event.stopPropagation();">›</span>
+  </div>
+
   <!-- FOOTER -->
   <footer>
     <p class="footer-logo">장씨아저씨 프리미엄 과일</p>
@@ -671,10 +725,11 @@
             <a href="https://open.kakao.com/o/gz1NvAQh" target="_blank" class="btn-secondary" style="display:inline-flex;margin-top:8px;">👥 단톡방 참여하기</a>
           </div>`;
       } else {
-        section.innerHTML = `<div class="fruit-grid">${data.fruits.map(f => `
+        window._lbSets = data.fruits.map(f => f.images || []);
+        section.innerHTML = `<div class="fruit-grid">${data.fruits.map((f, fi) => `
           <div class="fruit-card">
             ${f.images && f.images.length > 0
-              ? `<div class="fruit-photos">${f.images.map(url => `<img src="${url}" alt="${f.name}" />`).join('')}</div>`
+              ? `<div class="fruit-photos">${f.images.map((url, j) => `<img src="${url}" alt="${f.name}" onclick="openLightbox(${fi}, ${j})" />`).join('')}</div>`
               : `<span class="fruit-emoji">${f.emoji}</span>`}
             <p class="fruit-origin">${f.origin}</p>
             <h3 class="fruit-name">${f.name}</h3>
@@ -684,6 +739,38 @@
       }
     } catch(e) {}
   }
+
+  // ── 라이트박스 ──
+  let _lbImages = [], _lbIdx = 0;
+
+  function openLightbox(setIdx, imgIdx) {
+    _lbImages = window._lbSets[setIdx] || [];
+    _lbIdx = imgIdx;
+    document.getElementById('lightbox-img').src = _lbImages[_lbIdx];
+    document.getElementById('lightbox').classList.add('active');
+    document.getElementById('lightbox-prev').style.display = _lbImages.length > 1 ? 'block' : 'none';
+    document.getElementById('lightbox-next').style.display = _lbImages.length > 1 ? 'block' : 'none';
+    document.body.style.overflow = 'hidden';
+  }
+
+  function lightboxMove(dir) {
+    _lbIdx = (_lbIdx + dir + _lbImages.length) % _lbImages.length;
+    document.getElementById('lightbox-img').src = _lbImages[_lbIdx];
+  }
+
+  function closeLightbox(e) {
+    if (e && e.target === document.getElementById('lightbox-img')) return;
+    document.getElementById('lightbox').classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  document.addEventListener('keydown', e => {
+    const lb = document.getElementById('lightbox');
+    if (!lb.classList.contains('active')) return;
+    if (e.key === 'ArrowLeft')  lightboxMove(-1);
+    if (e.key === 'ArrowRight') lightboxMove(1);
+    if (e.key === 'Escape')     closeLightbox();
+  });
 
   loadData();
 </script>

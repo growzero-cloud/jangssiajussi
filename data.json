@@ -1,17 +1,4 @@
 {
-  "status": "open",
-  "fruits": [
-    {
-      "emoji": "🍑",
-      "name": "레드키위",
-      "origin": "1팩 14개",
-      "price": "16,500원",
-      "desc": "상온 후숙 후\n말랑한것부터 드세요",
-      "images": [
-        "https://growzero-cloud.github.io/jangssiajussi/images/1775828441611-xo42wimea.jpg",
-        "https://growzero-cloud.github.io/jangssiajussi/images/1775828443677-bsu7gt2zzk5.jpg",
-        "https://growzero-cloud.github.io/jangssiajussi/images/1775828445216-np4wo3ajy2b.jpg"
-      ]
-    }
-  ]
+  "status": "closed",
+  "fruits": []
 }
