@@ -417,10 +417,22 @@
 
   let state = { status: 'closed', fruits: [] };
 
+  // ── 자동 로그인 (창 닫기 전까지 유지) ──
+  if (sessionStorage.getItem('logged_in') === 'true') {
+    document.getElementById('login-screen').style.display = 'none';
+    const token = localStorage.getItem('gh_token');
+    if (!token) {
+      document.getElementById('setup-screen').style.display = 'flex';
+    } else {
+      showAdmin();
+    }
+  }
+
   // ── 로그인 ──
   function doLogin() {
     const pw = document.getElementById('pw-input').value;
     if (pw === PASSWORD) {
+      sessionStorage.setItem('logged_in', 'true');
       document.getElementById('login-screen').style.display = 'none';
       const token = localStorage.getItem('gh_token');
       if (!token) {
