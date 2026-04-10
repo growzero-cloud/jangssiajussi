@@ -1,4 +1,17 @@
 {
-  "status": "closed",
-  "fruits": []
+  "status": "open",
+  "fruits": [
+    {
+      "emoji": "🍑",
+      "name": "키위",
+      "origin": "1팩",
+      "price": "173,999,000원",
+      "desc": "감사합니다",
+      "images": [
+        "https://growzero-cloud.github.io/jangssiajussi/images/1775829033506-aachw4czn4v.jpg",
+        "https://growzero-cloud.github.io/jangssiajussi/images/1775829036180-5jk8et6ulxt.jpg",
+        "https://growzero-cloud.github.io/jangssiajussi/images/1775829037496-tpdgvrrxgs.jpg"
+      ]
+    }
+  ]
 }
