@@ -260,6 +260,36 @@
     }
     .btn-add:hover { border-color: var(--gold); color: var(--gold); }
 
+    .image-upload-area {
+      border: 1px dashed var(--border);
+      padding: 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s;
+      margin-bottom: 12px;
+      position: relative;
+    }
+    .image-upload-area:hover { border-color: var(--gold); }
+    .image-upload-area input[type=file] {
+      position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+    }
+    .image-upload-label { font-size: 13px; color: var(--gray); pointer-events: none; }
+    .image-previews {
+      display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px;
+    }
+    .image-preview-item {
+      position: relative; width: 80px; height: 80px;
+    }
+    .image-preview-item img {
+      width: 100%; height: 100%; object-fit: cover; border: 1px solid var(--border);
+    }
+    .image-preview-item .img-del {
+      position: absolute; top: -6px; right: -6px;
+      background: var(--red); color: #fff; border: none;
+      width: 18px; height: 18px; border-radius: 50%;
+      font-size: 11px; cursor: pointer; line-height: 18px; text-align: center;
+    }
+
     .add-form {
       background: var(--black);
       border: 1px solid var(--border);
@@ -397,6 +427,14 @@
           <label class="form-label">한줄 설명</label>
           <textarea class="form-textarea" id="f-desc" placeholder="달고 향기로운 청포도, 껍질째 먹어요."></textarea>
         </div>
+        <div class="form-group">
+          <label class="form-label">사진 (최대 5장)</label>
+          <div class="image-upload-area">
+            <input type="file" id="f-images" accept="image/*" multiple onchange="handleNewImages(this)" />
+            <span class="image-upload-label">📷 클릭해서 사진 선택</span>
+          </div>
+          <div class="image-previews" id="f-image-previews"></div>
+        </div>
         <button class="btn-gold" style="width:100%;" onclick="addFruit()">추가</button>
       </div>
     </div>
@@ -416,6 +454,8 @@
   const PASSWORD   = 'jang1234'; // ← 비밀번호 (나중에 바꾸세요)
 
   let state = { status: 'closed', fruits: [] };
+  let newImages = [];       // 추가 폼 이미지
+  let editImages = {};      // 수정 폼 이미지 { fruitIndex: [File, ...] }
 
   // ── 자동 로그인 (창 닫기 전까지 유지) ──
   if (sessionStorage.getItem('logged_in') === 'true') {
@@ -529,6 +569,20 @@
               <label class="form-label">한줄 설명</label>
               <textarea class="form-textarea" id="ef-desc-${i}">${f.desc}</textarea>
             </div>
+            <div class="form-group">
+              <label class="form-label">사진 (최대 5장)</label>
+              <div class="image-upload-area">
+                <input type="file" accept="image/*" multiple onchange="handleEditImages(this, ${i})" />
+                <span class="image-upload-label">📷 클릭해서 사진 추가</span>
+              </div>
+              <div class="image-previews" id="ef-previews-${i}">
+                ${(f.images||[]).map((url, j) => `
+                  <div class="image-preview-item" id="ef-img-${i}-${j}">
+                    <img src="${url}" />
+                    <button class="img-del" onclick="removeExistingImage(${i}, ${j})">×</button>
+                  </div>`).join('')}
+              </div>
+            </div>
             <button class="btn-gold" style="width:100%;" onclick="saveEdit(${i})">수정 완료</button>
           </div>
         </div>
@@ -549,6 +603,92 @@
     f.style.display = f.style.display === 'block' ? 'none' : 'block';
   }
 
+  // ── 이미지 처리 ──
+  function handleNewImages(input) {
+    const files = Array.from(input.files);
+    const remaining = 5 - newImages.length;
+    if (remaining <= 0) { alert('최대 5장까지 추가할 수 있어요'); input.value=''; return; }
+    newImages = newImages.concat(files.slice(0, remaining));
+    renderNewPreviews();
+    input.value = '';
+  }
+
+  function renderNewPreviews() {
+    const container = document.getElementById('f-image-previews');
+    container.innerHTML = newImages.map((f, j) => `
+      <div class="image-preview-item">
+        <img src="${URL.createObjectURL(f)}" />
+        <button class="img-del" onclick="removeNewImage(${j})">×</button>
+      </div>`).join('');
+  }
+
+  function removeNewImage(j) {
+    newImages.splice(j, 1);
+    renderNewPreviews();
+  }
+
+  function handleEditImages(input, i) {
+    if (!editImages[i]) editImages[i] = [];
+    const existing = (state.fruits[i].images || []).length;
+    const already  = editImages[i].length;
+    const remaining = 5 - existing - already;
+    if (remaining <= 0) { alert('최대 5장까지 추가할 수 있어요'); input.value=''; return; }
+    const files = Array.from(input.files).slice(0, remaining);
+    editImages[i] = editImages[i].concat(files);
+    renderEditPreviews(i);
+    input.value = '';
+  }
+
+  function renderEditPreviews(i) {
+    const container = document.getElementById('ef-previews-' + i);
+    if (!container) return;
+    const existing = (state.fruits[i].images || []).map((url, j) => `
+      <div class="image-preview-item" id="ef-img-${i}-${j}">
+        <img src="${url}" />
+        <button class="img-del" onclick="removeExistingImage(${i}, ${j})">×</button>
+      </div>`).join('');
+    const newFiles = (editImages[i] || []).map((f, j) => `
+      <div class="image-preview-item">
+        <img src="${URL.createObjectURL(f)}" />
+        <button class="img-del" onclick="removeEditNewImage(${i}, ${j})">×</button>
+      </div>`).join('');
+    container.innerHTML = existing + newFiles;
+  }
+
+  function removeExistingImage(i, j) {
+    state.fruits[i].images.splice(j, 1);
+    renderEditPreviews(i);
+    setSaveStatus('저장 버튼을 눌러 반영하세요', '');
+  }
+
+  function removeEditNewImage(i, j) {
+    editImages[i].splice(j, 1);
+    renderEditPreviews(i);
+  }
+
+  // ── 이미지 GitHub 업로드 ──
+  function fileToBase64(file) {
+    return new Promise(resolve => {
+      const reader = new FileReader();
+      reader.onload = e => resolve(e.target.result.split(',')[1]);
+      reader.readAsDataURL(file);
+    });
+  }
+
+  async function uploadImage(file, token) {
+    const ext = file.name.split('.').pop().replace(/[^a-z0-9]/gi,'') || 'jpg';
+    const path = `images/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+    const content = await fileToBase64(file);
+    const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${path}`, {
+      method: 'PUT',
+      headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github+json', 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: '이미지 업로드', content })
+    });
+    if (!res.ok) throw new Error('이미지 업로드 실패');
+    return `https://${REPO_OWNER}.github.io/${REPO_NAME}/${path}`;
+  }
+
+  // ── 과일 추가 ──
   function addFruit() {
     const emoji  = document.getElementById('f-emoji').value.trim() || '🍑';
     const name   = document.getElementById('f-name').value.trim();
@@ -556,7 +696,10 @@
     const price  = document.getElementById('f-price').value.trim();
     const desc   = document.getElementById('f-desc').value.trim();
     if (!name) { alert('과일 이름을 입력해주세요'); return; }
-    state.fruits.push({ emoji, name, origin, price, desc });
+    const idx = state.fruits.length;
+    state.fruits.push({ emoji, name, origin, price, desc, images: [] });
+    if (newImages.length > 0) editImages[idx] = [...newImages];
+    newImages = [];
     ['f-emoji','f-name','f-origin','f-price','f-desc'].forEach(id => document.getElementById(id).value = '');
     document.getElementById('add-form').style.display = 'none';
     renderAll();
@@ -570,6 +713,7 @@
 
   function saveEdit(i) {
     state.fruits[i] = {
+      ...state.fruits[i],
       emoji:  document.getElementById('ef-emoji-' + i).value.trim() || '🍑',
       name:   document.getElementById('ef-name-' + i).value.trim(),
       origin: document.getElementById('ef-origin-' + i).value.trim(),
@@ -582,6 +726,7 @@
 
   function deleteFruit(i) {
     state.fruits.splice(i, 1);
+    delete editImages[i];
     renderAll();
     setSaveStatus('저장 버튼을 눌러 반영하세요', '');
   }
@@ -594,17 +739,29 @@
     const btn = document.getElementById('save-btn');
     btn.disabled = true;
     btn.textContent = '저장 중...';
-    setSaveStatus('홈페이지에 반영하는 중...', '');
+    setSaveStatus('이미지 업로드 중...', '');
 
     try {
-      // 현재 파일 SHA 가져오기
+      // 새 이미지 업로드
+      for (const [idxStr, files] of Object.entries(editImages)) {
+        const i = parseInt(idxStr);
+        if (!files || files.length === 0) continue;
+        const urls = await Promise.all(files.map(f => uploadImage(f, token)));
+        if (!state.fruits[i].images) state.fruits[i].images = [];
+        state.fruits[i].images = state.fruits[i].images.concat(urls);
+        editImages[i] = [];
+      }
+
+      setSaveStatus('데이터 저장 중...', '');
+
+      // data.json SHA 가져오기
       const metaRes = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${DATA_PATH}`, {
         headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github+json' }
       });
       const meta = await metaRes.json();
       const sha = meta.sha;
 
-      // 새 내용 업로드
+      // data.json 업로드
       const content = btoa(unescape(encodeURIComponent(JSON.stringify(state, null, 2))));
       const putRes = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${DATA_PATH}`, {
         method: 'PUT',
@@ -614,12 +771,13 @@
 
       if (putRes.ok) {
         setSaveStatus('✅ 저장 완료! 1~2분 후 홈페이지에 반영돼요.', 'success');
+        renderAll();
       } else {
         const err = await putRes.json();
         setSaveStatus('❌ 오류: ' + (err.message || '저장 실패'), 'error');
       }
     } catch(e) {
-      setSaveStatus('❌ 네트워크 오류, 다시 시도해주세요', 'error');
+      setSaveStatus('❌ ' + e.message, 'error');
     }
 
     btn.disabled = false;

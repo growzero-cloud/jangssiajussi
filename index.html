@@ -272,6 +272,20 @@
 
     .fruit-card:hover { border-color: var(--gold-dim); }
 
+    .fruit-photos {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 20px;
+      overflow-x: auto;
+    }
+    .fruit-photos img {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
     .fruit-emoji {
       font-size: 40px;
       margin-bottom: 20px;
@@ -659,7 +673,9 @@
       } else {
         section.innerHTML = `<div class="fruit-grid">${data.fruits.map(f => `
           <div class="fruit-card">
-            <span class="fruit-emoji">${f.emoji}</span>
+            ${f.images && f.images.length > 0
+              ? `<div class="fruit-photos">${f.images.map(url => `<img src="${url}" alt="${f.name}" />`).join('')}</div>`
+              : `<span class="fruit-emoji">${f.emoji}</span>`}
             <p class="fruit-origin">${f.origin}</p>
             <h3 class="fruit-name">${f.name}</h3>
             <p class="fruit-desc">${f.desc}</p>
