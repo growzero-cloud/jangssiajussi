@@ -513,10 +513,9 @@
     <p class="hero-sub">전국 공판장을 직접 누비며 그날 가장 맛있는 과일을 찾았을 때만 문을 엽니다</p>
 
     <div class="status-wrap">
-      <!-- 판매중일 때: class="status-badge open" / 준비중일 때: class="status-badge closed" -->
-      <div class="status-badge closed">
+      <div class="status-badge closed" id="status-badge">
         <span class="status-dot"></span>
-        <span>현재 준비중입니다</span>
+        <span id="status-text">현재 준비중입니다</span>
       </div>
     </div>
 
@@ -537,33 +536,7 @@
     <p class="section-label">Today's Selection</p>
     <h2 class="section-title">오늘의 과일</h2>
 
-    <!-- 판매 없을 때 보여줄 메시지 (판매중엔 아래 카드로 교체) -->
-    <div style="background:var(--card); border:1px solid var(--border); padding:64px 32px; text-align:center;">
-      <p style="font-size:40px; margin-bottom:20px;">🍑</p>
-      <p style="font-family:'Noto Serif KR',serif; font-size:20px; color:var(--white); margin-bottom:12px;">오늘은 쉬는 날이에요</p>
-      <p style="font-size:14px; color:var(--gray); line-height:1.9;">
-        맛있는 과일을 찾는 날에만 문을 엽니다.<br />
-        단톡방을 참여해두시면 판매 시작할 때 가장 먼저 알 수 있어요.
-      </p>
-      <br />
-      <a href="https://open.kakao.com/o/gz1NvAQh" target="_blank" class="btn-secondary" style="display:inline-flex; margin-top:8px;">
-        👥 단톡방 참여하기
-      </a>
-    </div>
-
-    <!--
-    ▼▼▼ 판매중일 때는 위 div 지우고 아래 주석 해제 ▼▼▼
-
-    <div class="fruit-grid">
-      <div class="fruit-card">
-        <span class="fruit-emoji">🍇</span>
-        <p class="fruit-origin">경북 영천</p>
-        <h3 class="fruit-name">샤인머스캣</h3>
-        <p class="fruit-desc">껍질째 먹는 청포도. 높은 당도와 머스캣 향이 진해 한 알만 먹어도 기분이 좋아집니다.</p>
-        <p class="fruit-price">2kg · 35,000원</p>
-      </div>
-    </div>
-    -->
+    <div id="fruit-section"></div>
   </section>
 
   <!-- STORY -->
@@ -653,6 +626,51 @@
     <p class="footer-logo">장씨아저씨 프리미엄 과일</p>
     <p class="footer-copy">전국 공판장 직접 선별 · 맛있을 때만 판매</p>
   </footer>
+
+<script>
+  async function loadData() {
+    try {
+      const res = await fetch('https://raw.githubusercontent.com/growzero-cloud/jangssiajussi/main/data.json?t=' + Date.now());
+      if (!res.ok) return;
+      const data = await res.json();
+
+      // 상태 배지
+      const badge = document.getElementById('status-badge');
+      const text  = document.getElementById('status-text');
+      if (data.status === 'open') {
+        badge.className = 'status-badge open';
+        text.textContent = '현재 판매중입니다';
+      } else {
+        badge.className = 'status-badge closed';
+        text.textContent = '현재 준비중입니다';
+      }
+
+      // 과일 섹션
+      const section = document.getElementById('fruit-section');
+      if (!data.fruits || data.fruits.length === 0) {
+        section.innerHTML = `
+          <div style="background:var(--card);border:1px solid var(--border);padding:64px 32px;text-align:center;">
+            <p style="font-size:40px;margin-bottom:20px;">🍑</p>
+            <p style="font-family:'Noto Serif KR',serif;font-size:20px;color:var(--white);margin-bottom:12px;">오늘은 쉬는 날이에요</p>
+            <p style="font-size:14px;color:var(--gray);line-height:1.9;">맛있는 과일을 찾는 날에만 문을 엽니다.<br/>단톡방에 참여해두시면 판매 시작할 때 가장 먼저 알 수 있어요.</p>
+            <br/>
+            <a href="https://open.kakao.com/o/gz1NvAQh" target="_blank" class="btn-secondary" style="display:inline-flex;margin-top:8px;">👥 단톡방 참여하기</a>
+          </div>`;
+      } else {
+        section.innerHTML = `<div class="fruit-grid">${data.fruits.map(f => `
+          <div class="fruit-card">
+            <span class="fruit-emoji">${f.emoji}</span>
+            <p class="fruit-origin">${f.origin}</p>
+            <h3 class="fruit-name">${f.name}</h3>
+            <p class="fruit-desc">${f.desc}</p>
+            <p class="fruit-price">${f.price}</p>
+          </div>`).join('')}</div>`;
+      }
+    } catch(e) {}
+  }
+
+  loadData();
+</script>
 
 </body>
 </html>

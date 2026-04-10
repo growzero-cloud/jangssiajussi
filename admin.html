@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>관리자 · 장씨아저씨</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --black: #0f0f0f;
+      --card: #1a1a1a;
+      --border: #2e2e2e;
+      --gold: #c9a84c;
+      --gold-light: #e2c170;
+      --white: #f0ebe0;
+      --gray: #888;
+      --red: #e05555;
+      --green: #5cb85c;
+    }
+    body {
+      background: var(--black);
+      color: var(--white);
+      font-family: 'Noto Sans KR', sans-serif;
+      font-weight: 300;
+      min-height: 100vh;
+    }
+
+    /* LOGIN */
+    #login-screen {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .login-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      padding: 48px 40px;
+      width: 100%;
+      max-width: 380px;
+      text-align: center;
+    }
+    .login-title {
+      font-size: 20px;
+      font-weight: 500;
+      margin-bottom: 8px;
+      color: var(--gold);
+    }
+    .login-sub { font-size: 13px; color: var(--gray); margin-bottom: 36px; }
+    .login-box input {
+      width: 100%;
+      background: var(--black);
+      border: 1px solid var(--border);
+      color: var(--white);
+      padding: 14px 16px;
+      font-size: 16px;
+      letter-spacing: 0.2em;
+      text-align: center;
+      outline: none;
+      margin-bottom: 16px;
+      font-family: inherit;
+    }
+    .login-box input:focus { border-color: var(--gold); }
+    .btn-gold {
+      width: 100%;
+      background: var(--gold);
+      color: #000;
+      border: none;
+      padding: 14px;
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.2s;
+    }
+    .btn-gold:hover { background: var(--gold-light); }
+    .login-error { color: var(--red); font-size: 13px; margin-top: 12px; display: none; }
+
+    /* SETUP */
+    #setup-screen {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .setup-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      padding: 48px 40px;
+      width: 100%;
+      max-width: 500px;
+    }
+    .setup-title { font-size: 18px; font-weight: 500; color: var(--gold); margin-bottom: 8px; }
+    .setup-sub { font-size: 13px; color: var(--gray); margin-bottom: 28px; line-height: 1.8; }
+    .setup-steps {
+      background: var(--black);
+      border: 1px solid var(--border);
+      padding: 20px;
+      margin-bottom: 24px;
+      font-size: 13px;
+      color: var(--gray);
+      line-height: 2;
+    }
+    .setup-steps a { color: var(--gold); }
+    .setup-box input {
+      width: 100%;
+      background: var(--black);
+      border: 1px solid var(--border);
+      color: var(--white);
+      padding: 14px 16px;
+      font-size: 13px;
+      outline: none;
+      margin-bottom: 16px;
+      font-family: monospace;
+    }
+    .setup-box input:focus { border-color: var(--gold); }
+
+    /* ADMIN */
+    #admin-screen { display: none; }
+    .topbar {
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .topbar-title { font-size: 15px; color: var(--gold); font-weight: 500; }
+    .btn-sm {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--gray);
+      padding: 8px 16px;
+      font-size: 12px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s;
+    }
+    .btn-sm:hover { border-color: var(--gold); color: var(--gold); }
+
+    .admin-body { max-width: 700px; margin: 0 auto; padding: 40px 24px 80px; }
+
+    /* STATUS CARD */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      padding: 32px;
+      margin-bottom: 24px;
+    }
+    .card-title {
+      font-size: 13px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--gray);
+      margin-bottom: 20px;
+    }
+
+    /* STATUS TOGGLE */
+    .status-toggle {
+      display: flex;
+      gap: 12px;
+    }
+    .toggle-btn {
+      flex: 1;
+      padding: 20px;
+      border: 2px solid var(--border);
+      background: transparent;
+      color: var(--gray);
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    .toggle-btn .icon { font-size: 28px; }
+    .toggle-btn.active-open {
+      border-color: var(--green);
+      color: var(--green);
+      background: rgba(92,184,92,0.08);
+    }
+    .toggle-btn.active-closed {
+      border-color: var(--red);
+      color: var(--red);
+      background: rgba(224,85,85,0.08);
+    }
+
+    /* FRUIT FORM */
+    .form-group { margin-bottom: 16px; }
+    .form-label { font-size: 12px; color: var(--gray); margin-bottom: 6px; display: block; letter-spacing: 0.06em; }
+    .form-input, .form-textarea {
+      width: 100%;
+      background: var(--black);
+      border: 1px solid var(--border);
+      color: var(--white);
+      padding: 12px 14px;
+      font-size: 14px;
+      outline: none;
+      font-family: inherit;
+      transition: border-color 0.2s;
+    }
+    .form-input:focus, .form-textarea:focus { border-color: var(--gold); }
+    .form-textarea { min-height: 80px; resize: vertical; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    /* FRUIT LIST */
+    .fruit-item {
+      background: var(--black);
+      border: 1px solid var(--border);
+      padding: 16px 20px;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .fruit-item-info { display: flex; align-items: center; gap: 12px; }
+    .fruit-item-emoji { font-size: 24px; }
+    .fruit-item-name { font-size: 15px; font-weight: 500; }
+    .fruit-item-price { font-size: 13px; color: var(--gold); }
+    .btn-delete {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--gray);
+      padding: 6px 12px;
+      font-size: 12px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .btn-delete:hover { border-color: var(--red); color: var(--red); }
+
+    .btn-add {
+      width: 100%;
+      background: transparent;
+      border: 1px dashed var(--border);
+      color: var(--gray);
+      padding: 14px;
+      font-size: 14px;
+      cursor: pointer;
+      font-family: inherit;
+      margin-bottom: 16px;
+      transition: all 0.2s;
+    }
+    .btn-add:hover { border-color: var(--gold); color: var(--gold); }
+
+    .add-form {
+      background: var(--black);
+      border: 1px solid var(--border);
+      padding: 24px;
+      margin-bottom: 16px;
+      display: none;
+    }
+
+    /* SAVE */
+    .save-bar {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      background: var(--card);
+      border-top: 1px solid var(--border);
+      padding: 16px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .save-status { font-size: 13px; color: var(--gray); }
+    .save-status.success { color: var(--green); }
+    .save-status.error { color: var(--red); }
+    .btn-save {
+      background: var(--gold);
+      color: #000;
+      border: none;
+      padding: 14px 40px;
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.2s;
+    }
+    .btn-save:hover { background: var(--gold-light); }
+    .btn-save:disabled { background: var(--border); color: var(--gray); cursor: not-allowed; }
+
+    @media (max-width: 480px) {
+      .login-box, .setup-box { padding: 32px 24px; }
+      .form-row { grid-template-columns: 1fr; }
+      .topbar { padding: 14px 16px; }
+      .admin-body { padding: 24px 16px 80px; }
+      .card { padding: 24px 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- 로그인 -->
+<div id="login-screen">
+  <div class="login-box">
+    <p class="login-title">장씨아저씨 관리자</p>
+    <p class="login-sub">비밀번호를 입력해주세요</p>
+    <input type="password" id="pw-input" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()" />
+    <button class="btn-gold" onclick="doLogin()">로그인</button>
+    <p class="login-error" id="login-error">비밀번호가 틀렸습니다</p>
+  </div>
+</div>
+
+<!-- GitHub 토큰 초기 설정 -->
+<div id="setup-screen" style="display:none;">
+  <div class="setup-box">
+    <p class="setup-title">첫 설정 · GitHub 토큰 입력</p>
+    <p class="setup-sub">홈페이지를 수정하려면 GitHub 토큰이 한 번만 필요해요.<br />입력하면 이 기기에 저장되어 다음부턴 안 물어봐요.</p>
+    <div class="setup-steps">
+      1. <a href="https://github.com/settings/tokens/new" target="_blank">github.com/settings/tokens/new</a> 접속<br />
+      2. Note에 아무 이름 입력 (예: 장씨관리자)<br />
+      3. Expiration → <strong>No expiration</strong> 선택<br />
+      4. <strong>repo</strong> 체크박스 클릭<br />
+      5. 하단 <strong>Generate token</strong> 클릭<br />
+      6. 나온 토큰(ghp_로 시작) 복사해서 아래 붙여넣기
+    </div>
+    <input type="text" id="token-input" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" />
+    <button class="btn-gold" onclick="saveToken()">저장하고 시작하기</button>
+  </div>
+</div>
+
+<!-- 관리자 -->
+<div id="admin-screen">
+  <div class="topbar">
+    <span class="topbar-title">장씨아저씨 관리자</span>
+    <div style="display:flex;gap:8px;">
+      <button class="btn-sm" onclick="window.open('https://growzero-cloud.github.io/jangssiajussi/','_blank')">홈페이지 보기</button>
+      <button class="btn-sm" onclick="logout()">로그아웃</button>
+    </div>
+  </div>
+
+  <div class="admin-body">
+
+    <!-- 판매 상태 -->
+    <div class="card">
+      <p class="card-title">판매 상태</p>
+      <div class="status-toggle">
+        <button class="toggle-btn" id="btn-open" onclick="setStatus('open')">
+          <span class="icon">🟢</span>
+          <span>판매중</span>
+        </button>
+        <button class="toggle-btn" id="btn-closed" onclick="setStatus('closed')">
+          <span class="icon">🔴</span>
+          <span>준비중</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- 오늘의 과일 -->
+    <div class="card">
+      <p class="card-title">오늘의 과일</p>
+
+      <div id="fruit-list"></div>
+
+      <button class="btn-add" onclick="toggleAddForm()">+ 과일 추가</button>
+
+      <div class="add-form" id="add-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">이모지</label>
+            <input class="form-input" id="f-emoji" placeholder="🍇" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">과일 이름</label>
+            <input class="form-input" id="f-name" placeholder="샤인머스캣" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">산지</label>
+            <input class="form-input" id="f-origin" placeholder="경북 영천" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">가격</label>
+            <input class="form-input" id="f-price" placeholder="2kg · 35,000원" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">한줄 설명</label>
+          <textarea class="form-textarea" id="f-desc" placeholder="달고 향기로운 청포도, 껍질째 먹어요."></textarea>
+        </div>
+        <button class="btn-gold" style="width:100%;" onclick="addFruit()">추가</button>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="save-bar">
+    <span class="save-status" id="save-status">변경사항을 저장해주세요</span>
+    <button class="btn-save" id="save-btn" onclick="saveAll()">홈페이지에 저장</button>
+  </div>
+</div>
+
+<script>
+  const REPO_OWNER = 'growzero-cloud';
+  const REPO_NAME  = 'jangssiajussi';
+  const DATA_PATH  = 'data.json';
+  const PASSWORD   = 'jang1234'; // ← 비밀번호 (나중에 바꾸세요)
+
+  let state = { status: 'closed', fruits: [] };
+
+  // ── 로그인 ──
+  function doLogin() {
+    const pw = document.getElementById('pw-input').value;
+    if (pw === PASSWORD) {
+      document.getElementById('login-screen').style.display = 'none';
+      const token = localStorage.getItem('gh_token');
+      if (!token) {
+        document.getElementById('setup-screen').style.display = 'flex';
+      } else {
+        showAdmin();
+      }
+    } else {
+      document.getElementById('login-error').style.display = 'block';
+    }
+  }
+
+  function logout() {
+    document.getElementById('admin-screen').style.display = 'none';
+    document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById('pw-input').value = '';
+  }
+
+  // ── 토큰 저장 ──
+  function saveToken() {
+    const token = document.getElementById('token-input').value.trim();
+    if (!token.startsWith('ghp_') && !token.startsWith('github_pat_')) {
+      alert('토큰이 올바르지 않아요. ghp_ 또는 github_pat_ 으로 시작해야 해요.');
+      return;
+    }
+    localStorage.setItem('gh_token', token);
+    document.getElementById('setup-screen').style.display = 'none';
+    showAdmin();
+  }
+
+  // ── 관리자 화면 ──
+  async function showAdmin() {
+    document.getElementById('admin-screen').style.display = 'block';
+    await loadData();
+    renderAll();
+  }
+
+  // ── 데이터 불러오기 ──
+  async function loadData() {
+    try {
+      const res = await fetch(`https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/main/${DATA_PATH}?t=${Date.now()}`);
+      if (res.ok) state = await res.json();
+    } catch(e) {}
+  }
+
+  // ── 렌더링 ──
+  function renderAll() {
+    // 상태 버튼
+    document.getElementById('btn-open').className = 'toggle-btn' + (state.status === 'open' ? ' active-open' : '');
+    document.getElementById('btn-closed').className = 'toggle-btn' + (state.status === 'closed' ? ' active-closed' : '');
+
+    // 과일 목록
+    const list = document.getElementById('fruit-list');
+    if (state.fruits.length === 0) {
+      list.innerHTML = '<p style="color:var(--gray);font-size:13px;margin-bottom:16px;">등록된 과일이 없어요. 아래에서 추가해주세요.</p>';
+    } else {
+      list.innerHTML = state.fruits.map((f, i) => `
+        <div class="fruit-item">
+          <div class="fruit-item-info">
+            <span class="fruit-item-emoji">${f.emoji}</span>
+            <div>
+              <div class="fruit-item-name">${f.name} <span style="font-size:12px;color:var(--gray);">${f.origin}</span></div>
+              <div class="fruit-item-price">${f.price}</div>
+            </div>
+          </div>
+          <button class="btn-delete" onclick="deleteFruit(${i})">삭제</button>
+        </div>
+      `).join('');
+    }
+  }
+
+  // ── 상태 변경 ──
+  function setStatus(s) {
+    state.status = s;
+    renderAll();
+    setSaveStatus('저장 버튼을 눌러 반영하세요', '');
+  }
+
+  // ── 과일 추가 폼 ──
+  function toggleAddForm() {
+    const f = document.getElementById('add-form');
+    f.style.display = f.style.display === 'block' ? 'none' : 'block';
+  }
+
+  function addFruit() {
+    const emoji  = document.getElementById('f-emoji').value.trim() || '🍑';
+    const name   = document.getElementById('f-name').value.trim();
+    const origin = document.getElementById('f-origin').value.trim();
+    const price  = document.getElementById('f-price').value.trim();
+    const desc   = document.getElementById('f-desc').value.trim();
+    if (!name) { alert('과일 이름을 입력해주세요'); return; }
+    state.fruits.push({ emoji, name, origin, price, desc });
+    ['f-emoji','f-name','f-origin','f-price','f-desc'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('add-form').style.display = 'none';
+    renderAll();
+    setSaveStatus('저장 버튼을 눌러 반영하세요', '');
+  }
+
+  function deleteFruit(i) {
+    state.fruits.splice(i, 1);
+    renderAll();
+    setSaveStatus('저장 버튼을 눌러 반영하세요', '');
+  }
+
+  // ── GitHub에 저장 ──
+  async function saveAll() {
+    const token = localStorage.getItem('gh_token');
+    if (!token) { alert('토큰이 없어요. 로그아웃 후 다시 로그인해주세요.'); return; }
+
+    const btn = document.getElementById('save-btn');
+    btn.disabled = true;
+    btn.textContent = '저장 중...';
+    setSaveStatus('홈페이지에 반영하는 중...', '');
+
+    try {
+      // 현재 파일 SHA 가져오기
+      const metaRes = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${DATA_PATH}`, {
+        headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github+json' }
+      });
+      const meta = await metaRes.json();
+      const sha = meta.sha;
+
+      // 새 내용 업로드
+      const content = btoa(unescape(encodeURIComponent(JSON.stringify(state, null, 2))));
+      const putRes = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${DATA_PATH}`, {
+        method: 'PUT',
+        headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github+json', 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: '관리자 페이지에서 업데이트', content, sha })
+      });
+
+      if (putRes.ok) {
+        setSaveStatus('✅ 저장 완료! 1~2분 후 홈페이지에 반영돼요.', 'success');
+      } else {
+        const err = await putRes.json();
+        setSaveStatus('❌ 오류: ' + (err.message || '저장 실패'), 'error');
+      }
+    } catch(e) {
+      setSaveStatus('❌ 네트워크 오류, 다시 시도해주세요', 'error');
+    }
+
+    btn.disabled = false;
+    btn.textContent = '홈페이지에 저장';
+  }
+
+  function setSaveStatus(msg, cls) {
+    const el = document.getElementById('save-status');
+    el.textContent = msg;
+    el.className = 'save-status' + (cls ? ' ' + cls : '');
+  }
+</script>
+
+</body>
+</html>
