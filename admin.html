@@ -225,7 +225,8 @@
     .fruit-item-emoji { font-size: 24px; }
     .fruit-item-name { font-size: 15px; font-weight: 500; }
     .fruit-item-price { font-size: 13px; color: var(--gold); }
-    .btn-delete {
+    .fruit-item-btns { display: flex; gap: 6px; }
+    .btn-delete, .btn-edit {
       background: transparent;
       border: 1px solid var(--border);
       color: var(--gray);
@@ -235,6 +236,15 @@
       font-family: inherit;
     }
     .btn-delete:hover { border-color: var(--red); color: var(--red); }
+    .btn-edit:hover { border-color: var(--gold); color: var(--gold); }
+    .edit-form {
+      background: var(--black);
+      border: 1px solid var(--gold-dim);
+      padding: 20px;
+      margin-top: 8px;
+      margin-bottom: 8px;
+      display: none;
+    }
 
     .btn-add {
       width: 100%;
@@ -468,15 +478,47 @@
       list.innerHTML = '<p style="color:var(--gray);font-size:13px;margin-bottom:16px;">등록된 과일이 없어요. 아래에서 추가해주세요.</p>';
     } else {
       list.innerHTML = state.fruits.map((f, i) => `
-        <div class="fruit-item">
-          <div class="fruit-item-info">
-            <span class="fruit-item-emoji">${f.emoji}</span>
-            <div>
-              <div class="fruit-item-name">${f.name} <span style="font-size:12px;color:var(--gray);">${f.origin}</span></div>
-              <div class="fruit-item-price">${f.price}</div>
+        <div id="fruit-wrap-${i}">
+          <div class="fruit-item">
+            <div class="fruit-item-info">
+              <span class="fruit-item-emoji">${f.emoji}</span>
+              <div>
+                <div class="fruit-item-name">${f.name} <span style="font-size:12px;color:var(--gray);">${f.origin}</span></div>
+                <div class="fruit-item-price">${f.price}</div>
+              </div>
+            </div>
+            <div class="fruit-item-btns">
+              <button class="btn-edit" onclick="toggleEditForm(${i})">수정</button>
+              <button class="btn-delete" onclick="deleteFruit(${i})">삭제</button>
             </div>
           </div>
-          <button class="btn-delete" onclick="deleteFruit(${i})">삭제</button>
+          <div class="edit-form" id="edit-form-${i}">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">이모지</label>
+                <input class="form-input" id="ef-emoji-${i}" value="${f.emoji}" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">과일 이름</label>
+                <input class="form-input" id="ef-name-${i}" value="${f.name}" />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">산지</label>
+                <input class="form-input" id="ef-origin-${i}" value="${f.origin}" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">가격</label>
+                <input class="form-input" id="ef-price-${i}" value="${f.price}" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">한줄 설명</label>
+              <textarea class="form-textarea" id="ef-desc-${i}">${f.desc}</textarea>
+            </div>
+            <button class="btn-gold" style="width:100%;" onclick="saveEdit(${i})">수정 완료</button>
+          </div>
         </div>
       `).join('');
     }
@@ -505,6 +547,23 @@
     state.fruits.push({ emoji, name, origin, price, desc });
     ['f-emoji','f-name','f-origin','f-price','f-desc'].forEach(id => document.getElementById(id).value = '');
     document.getElementById('add-form').style.display = 'none';
+    renderAll();
+    setSaveStatus('저장 버튼을 눌러 반영하세요', '');
+  }
+
+  function toggleEditForm(i) {
+    const f = document.getElementById('edit-form-' + i);
+    f.style.display = f.style.display === 'block' ? 'none' : 'block';
+  }
+
+  function saveEdit(i) {
+    state.fruits[i] = {
+      emoji:  document.getElementById('ef-emoji-' + i).value.trim() || '🍑',
+      name:   document.getElementById('ef-name-' + i).value.trim(),
+      origin: document.getElementById('ef-origin-' + i).value.trim(),
+      price:  document.getElementById('ef-price-' + i).value.trim(),
+      desc:   document.getElementById('ef-desc-' + i).value.trim(),
+    };
     renderAll();
     setSaveStatus('저장 버튼을 눌러 반영하세요', '');
   }
