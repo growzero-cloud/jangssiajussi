@@ -1,4 +1,12 @@
 {
-  "status": "closed",
-  "fruits": []
+  "status": "open",
+  "fruits": [
+    {
+      "emoji": "🥝",
+      "name": "레드키위",
+      "origin": "1팩 14개",
+      "price": "16,500원",
+      "desc": "요즘 핫한 레드키위\n상온후숙->말랑한것부터 드세요"
+    }
+  ]
 }
